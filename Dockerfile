@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y \
 
 ## Install apt-utils
 ARG DEBIAN_FRONTEND=noninteractive
-#RUN apt-get update \
-#    && apt-get install -y --no-install-recommends apt-utils
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends apt-utils
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -85,13 +85,13 @@ ENV MEMORY_LIMIT 512M
 
 ENV IS_SYMFONY_2 = 0
 ENV IS_SYMFONY_3 = 0
-
+ENV REPOSITORY_PATH /var/www/default
 
 RUN echo 'alias ll="ls -l"' >> ~/.bashrc
 
-WORKDIR /var/www/default
+WORKDIR $REPOSITORY_PATH
 
 # Start!
-COPY ./start /usr/local/bin/
+ADD ./start /usr/local/bin/
 RUN chmod +x /usr/local/bin/start
 CMD ["start"]
