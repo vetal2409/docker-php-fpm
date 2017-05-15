@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+echo "Begin executing start script";
+
+# Configure PHP date.timezone
+echo "date.timezone = $PHP_TIMEZONE" > /usr/local/etc/php/conf.d/timezone.ini
+
+# Configure PHP memory limit
+echo "memory_limit = $MEMORY_LIMIT" > /usr/local/etc/php/conf.d/memory_limit.ini
+
+# Enable XDebug if needed
+if [ "$XDEBUG_ENABLE" = "1" ]; then
+    echo "Enabling Xdebug";
+    docker-php-ext-enable xdebug
+    mv /usr/local/etc/php/conf.d/xdebug.ini.disabled /usr/local/etc/php/conf.d/xdebug.ini
+    # Configure XDebug remote host
+    if [ -z "$HOST_IP" ]; then
+        # Allows to set HOST_IP by env variable because could be different from the one which come from ip route command
+        HOST_IP=$(/sbin/ip route|awk '/default/ { print $3 }')
+    fi;
+    echo "xdebug.remote_host=$HOST_IP" > /usr/local/etc/php/conf.d/xdebug_remote_host.ini
+fi;
+
+
+# [Symfony settings]
+if [[ "$IS_SYMFONY_3" = "1" ]] || [[ "$IS_SYMFONY_2" = "1" ]]; then
+    echo "Symfony configuration";
+    if [ $IS_SYMFONY_3 -eq 1 ]; then
+        echo "Symfony3 configuration";
+        echo 'alias sf="php bin/console"' >> ~/.bashrc
+    elif [ $IS_SYMFONY_2 -eq 1 ]; then
+        echo "Symfony2 configuration";
+        echo 'alias sf="php app/console"' >> ~/.bashrc
+    fi;
+
+    HTTPDUSER=www-data
+    setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX var
+    setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX var
+    echo "Added $HTTPDUSER permissions to var folder";
+fi;
+
+echo "End executing start script";
+exec "php-fpm"
