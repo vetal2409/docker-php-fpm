@@ -37,11 +37,20 @@ fi;
 
 # [Folder permissions]
 if [ -n "$PERMITTED_VARS" ]; then
+
+    PERMITTED_VARS_WITH_PREFIX=""
+    for PERMITTED_VAR in $PERMITTED_VARS
+    do
+        PERMITTED_VARS_WITH_PREFIX="$PERMITTED_VARS_WITH_PREFIX $REPOSITORY_PATH$PERMITTED_VAR"
+    done
+
+
     HTTPDUSER=www-data
-    setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX $PERMITTED_VARS
-    setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX $PERMITTED_VARS
-    echo "Added $HTTPDUSER permissions to the folders: ${PERMITTED_VARS}";
+    setfacl -R -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX $PERMITTED_VARS_WITH_PREFIX
+    setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX $PERMITTED_VARS_WITH_PREFIX
+    echo "Added $HTTPDUSER permissions to the folders: ${PERMITTED_VARS_WITH_PREFIX}";
 fi;
 
 echo "End executing start script";
 exec "php-fpm"
+
