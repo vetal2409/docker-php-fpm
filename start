@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 echo "Begin executing start script";
+echo "Currently is \"${PWD}\" directory";
+tree -df -L 1 ${PWD}/{web,var};
 
 # Configure PHP date.timezone
 echo "date.timezone = $PHP_TIMEZONE" > /usr/local/etc/php/conf.d/timezone.ini
@@ -26,10 +28,10 @@ fi;
 if [[ "$IS_SYMFONY_3" = "1" ]] || [[ "$IS_SYMFONY_2" = "1" ]]; then
     echo "Symfony configuration";
     if [ $IS_SYMFONY_3 -eq 1 ]; then
-        echo "Symfony3 configuration - alias sf=\"php ${REPOSITORY_PATH}bin/console\"";
+        echo "Symfony3 configuration - alias sf=\"php ${REPOSITORY_PATH}/bin/console\"";
         echo "alias sf=\"php ${REPOSITORY_PATH}/bin/console\"" >> ~/.bashrc
     elif [ $IS_SYMFONY_2 -eq 1 ]; then
-        echo "Symfony2 configuration - alias sf=\"php ${REPOSITORY_PATH}app/console\"";
+        echo "Symfony2 configuration - alias sf=\"php ${REPOSITORY_PATH}/app/console\"";
         echo "alias sf=\"php ${REPOSITORY_PATH}/app/console\"" >> ~/.bashrc
     fi;
 fi;
@@ -41,7 +43,11 @@ if [ -n "$PERMITTED_VARS" ]; then
     PERMITTED_VARS_WITH_PREFIX=""
     for PERMITTED_VAR in $PERMITTED_VARS
     do
-        PERMITTED_VARS_WITH_PREFIX="$PERMITTED_VARS_WITH_PREFIX $REPOSITORY_PATH$PERMITTED_VAR"
+	if [ -n "$PERMITTED_VARS" ]; then
+            PERMITTED_VARS_WITH_PREFIX="${PERMITTED_VARS_WITH_PREFIX} ${REPOSITORY_PATH}/${PERMITTED_VAR}"
+        else
+            PERMITTED_VARS_WITH_PREFIX="${REPOSITORY_PATH}/${PERMITTED_VAR}" 
+        fi;
     done
 
 
