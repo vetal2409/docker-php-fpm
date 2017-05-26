@@ -15,5 +15,15 @@ sed -i "s/xdebug.remote_connect_back=.*/xdebug.remote_host=$HOST_IP/" /etc/php/7
 echo "xDebug /etc/php/7.1/fpm/php.ini changes. remote_host=$HOST_IP  and remote_autostart=1";
 
 
+# Setup git variables
+if [ ! -z "$GIT_EMAIL" ]; then
+ git config --global user.email "$GIT_EMAIL"
+fi
+if [ ! -z "$GIT_NAME" ]; then
+ git config --global user.name "$GIT_NAME"
+ git config --global push.default simple
+fi
+echo "git global config: GIT_EMAIL: ${GIT_EMAIL} GIT_NAME: ${GIT_NAME}"
+
 echo "End executing start script";
 exec "php-fpm7.1"

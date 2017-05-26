@@ -2,7 +2,7 @@ FROM ubuntu:16.04
 
 MAINTAINER Vitalii Sydorenko <vetal.sydo@gmail.com>
 
-RUN apt-get clean && apt-get -y update && apt-get install -y locales curl software-properties-common git \
+RUN apt-get clean && apt-get -y update && apt-get install -y locales curl software-properties-common git unzip gzip nano tree \
   && locale-gen en_US.UTF-8 
 RUN LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php
 RUN apt-get update
@@ -38,7 +38,16 @@ RUN echo "xdebug.var_display_max_depth=128" >> /etc/php/7.1/mods-available/xdebu
 RUN echo "xdebug.max_nesting_level = 500" >> /etc/php/7.1/mods-available/xdebug.ini
 RUN echo "export PHP_IDE_CONFIG=\"serverName=server\"" >> ~/.bashrc
 
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN composer --version
+
+
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ENV WORKDIR /var/www/default
+WORKDIR $WORKDIR
 
 
 EXPOSE 9000
